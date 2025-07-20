@@ -201,7 +201,7 @@ function draw(){
     let camI = floor(camX / 100) + 25;
     let camJ = floor(camZ / 100) + 25;
 
-    let radiusXZ = 30;   
+    let radiusXZ = 20;   
     let radiusY = 5;    
     minangle = HALF_PI/5
     for (let i = max(1, camI - radiusXZ); i < min(99, camI + radiusXZ); i++) {
