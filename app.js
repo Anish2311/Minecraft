@@ -53,7 +53,7 @@ class Block{
         this.index = [i,j,k]
         this.life = 0.5
         this.death = null
-        this.red = 255*2
+        this.red = false
         this.status = true
         this.wat = 1
         if(y > depth){
@@ -66,8 +66,13 @@ class Block{
             // if (abs(this.pos.y - cam.pos.y )< 1000){
             push()
             translate(this.pos.x - cam.pos.x,this.pos.y - cam.pos.y, this.pos.z - cam.pos.z)
-            noStroke()
-            ambientMaterial(this.red*this.wat)
+            if(this.red == false){
+                noStroke()
+            }
+            else{
+                stroke(0)
+            }
+            ambientMaterial(map(p5.Vector.sub(this.pos,cam.pos).mag(),500,1000,255,-255))
             // shininess(50)
             fill(255,255,255,map(p5.Vector.sub(this.pos,cam.pos).mag(),500,1000,255,0))
             box(100,100,100)
@@ -124,18 +129,15 @@ class Block{
                             blocks[this.index[0]][this.index[1]][this.index[2]] = undefined
                             this.status = false
                         }
-                        else{
-                            this.red += (frameCount-this.death)/4
-                        }
                     }
                 }
                 else{
-                    this.red = 150
+                    this.red = true
                 }
             }
-            else{``
+            else{
                 this.death = null
-                this.red = 100
+                this.red = false
             }
 
             // Mob
@@ -207,7 +209,7 @@ function setup(){
         blocks.push([])
         for(let j = 0; j < 100; j++){
             blocks[i].push([])
-            let l = 50 + 50*noise(i/50,j/50)
+            let l = 50 + 50*noise(i/200,j/200)
             for (let k = 0; k < l; k++){
                 blocks[i][j].push(new Block((i-25)*100,(k)*-100,(j-25)*100,i,j,k))
             }
@@ -238,13 +240,13 @@ function draw(){
     if(cam.pos.y > depth - 100){
         ambientLight(200,250,200)
         pointLight(150,150,100,0,0,700)
-        background(250);
+        background(0);
         cam.vel = p5.Vector.mult(cam.vel,0.5)
     }
     else{
-        background(255);
+        background(0);
         pointLight(100,125,50,0,0,700);
-        ambientLight(255,255,255);
+        ambientLight(10,50,10);
     }
     // push()
     // translate(0,-1000,0)
