@@ -53,7 +53,7 @@ class Block{
         this.index = [i,j,k]
         this.life = 0.5
         this.death = null
-        this.red = 100
+        this.red = 255*2
         this.status = true
         this.wat = 1
         if(y > depth){
@@ -69,7 +69,7 @@ class Block{
             noStroke()
             ambientMaterial(this.red*this.wat)
             // shininess(50)
-            fill(100,100,100)
+            fill(255,255,255,map(p5.Vector.sub(this.pos,cam.pos).mag(),500,1000,255,0))
             box(100,100,100)
             pop()
             // }
@@ -96,7 +96,7 @@ class Block{
             let check = p5.Vector.sub(cam.pos,this.pos)
             let angi = abs(check.angleBetween(p5.Vector.mult(pointingVector,-1)))
 
-            if(angi < HALF_PI/3){
+            if(angi < HALF_PI/4){
                 if(check.mag() < 900 - zoom){
                     zooming = true
                     console.log('HE');
@@ -179,7 +179,7 @@ class Mob{
 
     update(){
         let dir = p5.Vector.sub(cam.pos,this.pos)
-        if(dir.mag() > 100 && dir.mag() < 600){
+        if(dir.mag() > 100 && dir.mag() < 1500){
             this.vel.x = dir.x/dir.mag() * 3
             this.vel.z = dir.z/dir.mag() * 3
         }
@@ -236,21 +236,22 @@ function draw(){
     minzoom = 450
     translate(0,0,zoom);
     if(cam.pos.y > depth - 100){
-        ambientLight(50,200,100)
-        pointLight(20,150,100)
-        background(50,150,200);
+        ambientLight(200,250,200)
+        pointLight(150,150,100,0,0,700)
+        background(250);
         cam.vel = p5.Vector.mult(cam.vel,0.5)
     }
     else{
-        background(100,200,200);
-        pointLight(50,255,250,0,0,700);
-        ambientLight(100,200,100);
+        background(255);
+        pointLight(100,125,50,0,0,700);
+        ambientLight(255,255,255);
     }
     // push()
     // translate(0,-1000,0)
     // pointLight(255,255,255,0,0,0)
     // pop()
-    ambientMaterial(0);
+    ambientMaterial(100);
+    fill(100)
     noStroke();
     sphere(30.10);
     
@@ -270,7 +271,7 @@ function draw(){
     let camI = floor(camX / 100) + 25;
     let camJ = floor(camZ / 100) + 25;
 
-    let radiusXZ = 20;   
+    let radiusXZ = 10;   
     let radiusY = 5;    
     minangle = HALF_PI/4
     for (let i = max(1, camI - radiusXZ); i < min(99, camI + radiusXZ); i++) {
@@ -298,12 +299,12 @@ function draw(){
     });
 
     if(zooming){
-        zoom += 50
+        zoom += 30
         // console.log('HEHE');
         
     }
     else{
-        if(zoom > 950 - minzoom) zoom -= 50;
+        if(zoom > 950 - minzoom) zoom -= 30;
 
     }
     if(flagR) moveR = true;
