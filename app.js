@@ -1,6 +1,7 @@
 new p5()
 
 let blocks = []
+let mobs = []
 let moveR = true
 let moveL = true
 let moveY = false
@@ -77,6 +78,9 @@ class Block{
     
     update(){
         if(this.status){
+
+            // Character
+
             if (abs(this.pos.y - cam.pos.y) <= 100 && abs(this.pos.z - cam.pos.z) < 50 && abs(this.pos.x - cam.pos.x) < 50){
                 moveY = false
                 cam.pos.y -= 100 - abs(this.pos.y - cam.pos.y)
@@ -133,10 +137,68 @@ class Block{
                 this.death = null
                 this.red = 100
             }
+
+            // Mob
+
+            mobs.forEach(e => {
+                if (abs(this.pos.y - e.pos.y) <= 100 && abs(this.pos.z - e.pos.z) < 50 && abs(this.pos.x - e.pos.x) < 50){
+                    e.moveY = false
+                    e.pos.y -= 100 - abs(this.pos.y - e.pos.y)
+                    // e.pos.x += 100 - abs(this.pos.x - e.pos.x)
+                }
+                let mcomp = p5.Vector.add(e.pos,p5.Vector.mult(e.vel,20))
+                if (abs(this.pos.y - e.pos.y) < 50 && this.pos.dist(mcomp) < 50){
+                    e.moveF = false
+                }
+            });
+            
         }
         
     }
     
+}
+
+class Mob{
+    constructor(h,x,y,z){
+        this.health = h
+        this.pos = createVector(x,y,z)
+        this.vel = createVector(random(-5,5),0,random(-5,5))
+        this.acc = createVector(0,2,0)
+        this.moveF = true
+        this.moveY = true
+    }
+
+    show(){
+        push()
+        translate(p5.Vector.sub(this.pos,cam.pos))
+        noStroke()
+        ambientMaterial(0,255,255)
+        sphere(50)
+        pop()
+    }
+
+    update(){
+        let dir = p5.Vector.sub(cam.pos,this.pos)
+        if(dir.mag() > 100 && dir.mag() < 600){
+            this.vel.x = dir.x/dir.mag() * 3
+            this.vel.z = dir.z/dir.mag() * 3
+        }
+        this.vel.add(this.acc)
+        if(this.moveF){
+            this.pos.x += this.vel.x
+            this.pos.z += this.vel.z
+        }
+        else{
+            this.vel.y = -25
+            this.moveY = true
+        }
+        if(this.moveY){
+            this.pos.y += this.vel.y
+        }
+        else{
+            this.vel.y = 0
+        }
+    }
 }
 
 function setup(){
@@ -150,6 +212,9 @@ function setup(){
                 blocks[i][j].push(new Block((i-25)*100,(k)*-100,(j-25)*100,i,j,k))
             }
         }
+    }
+    for(let i = 0; i< 5; i++){
+        mobs.push(new Mob(10,random(-1000,1000),-10000,random(-1000,1000)))
     }
 }
 
@@ -181,10 +246,14 @@ function draw(){
         pointLight(50,255,250,0,0,700);
         ambientLight(100,200,100);
     }
-    directionalLight(200,200,100,1,1,1)
-    ambientMaterial(150);
+    // push()
+    // translate(0,-1000,0)
+    // pointLight(255,255,255,0,0,0)
+    // pop()
+    ambientMaterial(0);
+    noStroke();
     sphere(30.10);
-
+    
     rotateY((mouseX / 100) * HALF_PI);
     rotate(((height / 2 - mouseY) / 100) * HALF_PI, p5.Vector.fromAngles(HALF_PI, HALF_PI - (mouseX / 100) * HALF_PI, 5));
 
@@ -201,9 +270,9 @@ function draw(){
     let camI = floor(camX / 100) + 25;
     let camJ = floor(camZ / 100) + 25;
 
-    let radiusXZ = 10;   
+    let radiusXZ = 20;   
     let radiusY = 5;    
-    minangle = HALF_PI/5
+    minangle = HALF_PI/4
     for (let i = max(1, camI - radiusXZ); i < min(99, camI + radiusXZ); i++) {
         for (let j = max(1, camJ - radiusXZ); j < min(99, camJ + radiusXZ); j++) {
             blocks[i][j].forEach((block,k) => {
@@ -220,6 +289,13 @@ function draw(){
             });
         }
     }
+
+    mobs.forEach(e => {
+        e.update()
+        e.show()
+        e.moveY = true
+        e.moveF = true
+    });
 
     if(zooming){
         zoom += 50
@@ -271,3 +347,4 @@ function mouseMoved(){
     
     // console.log(moveVector);
 }
+
